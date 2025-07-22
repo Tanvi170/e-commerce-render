@@ -42,14 +42,12 @@ router.get('/:storeId', async (req, res) => {
       WHERE store_id = ?
     `, [storeId]);
 
-    // 4. Total Revenue
-    const [[revenue]] = await pool.query(`
-      SELECT SUM(o.total_amount) AS revenue
-      FROM orders o
-      JOIN customers c ON o.customer_id = c.customer_id
-      WHERE c.store_id = ?
-    `, [storeId]);
-
+   // 4. Total Revenue from sales table directly by store_id
+const [[revenue]] = await pool.query(`
+  SELECT SUM(total_sale_amount) AS revenue
+  FROM sales
+  WHERE store_id = ?
+`, [storeId]);
     // 5. Top Selling Products
     const [topProducts] = await pool.query(`
       SELECT p.product_name, SUM(oi.quantity) AS sold
